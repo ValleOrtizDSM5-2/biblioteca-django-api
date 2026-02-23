@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,10 +27,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     # Third-party apps
     'rest_framework',
     'corsheaders',
     'django_filters',
+    'oauth2_provider',
+    'allauth', 
+    'allauth.account',  
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     
     # Tu aplicación
     'libros',
@@ -44,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'biblioteca_project.urls'
@@ -51,7 +59,7 @@ ROOT_URLCONF = 'biblioteca_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -193,3 +201,71 @@ LANGUAGE_CODE = 'es-mx'
 TIME_ZONE = 'America/Hermosillo'  # Hermosillo
 USE_I18N = True
 USE_TZ = True
+
+# =======================
+# SITE CONFIGURATION
+# =======================
+SITE_ID = 1  
+
+# =======================
+# AUTHENTICATION BACKENDS
+# =======================
+AUTHENTICATION_BACKENDS = [
+    # Backend por defecto de Django (username/password)
+    'django.contrib.auth.backends.ModelBackend',
+    
+    # Backend de allauth para OAuth social
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# =======================
+# DJANGO ALLAUTH CONFIG
+# =======================
+
+# Configuración de cuentas
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False  # Solo email para login social
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Para desarrollo: 'mandatory' en producción
+
+# Configuración de login social
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Crear usuario automáticamente
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # No verificar email en OAuth
+
+# Proveedores OAuth configurados
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
+}
+
+# =======================
+# OAUTH 2.0 PROVIDER SETTINGS
+# =======================
+# Configuración para django-oauth-toolkit
+OAUTH2_PROVIDER = {
+    # Tiempo de vida de los tokens
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,  # 1 hora
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 86400 * 7,  # 7 días
+    
+    # Scopes disponibles
+    'SCOPES': {
+        'read': 'Acceso de lectura',
+        'write': 'Acceso de escritura',
+    },
+    
+    # Tipo de token por defecto
+    'ACCESS_TOKEN_MODEL': 'oauth2_provider.AccessToken',
+    'REFRESH_TOKEN_MODEL': 'oauth2_provider.RefreshToken',
+}
