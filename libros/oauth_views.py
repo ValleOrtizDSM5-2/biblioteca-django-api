@@ -179,7 +179,7 @@ def google_oauth_redirect(request):
         f'&redirect_uri={redirect_uri}'
         f'&scope={" ".join(scopes).replace(" ", "%20")}'
         '&response_type=code'
-        '&access_type=online'
+        '&access_type=offline'
         '&prompt=consent'
     )
     
