@@ -31,18 +31,17 @@ urlpatterns = [
     # ─────────────────────────────────
     # 🔐 AUTENTICACIÓN JWT
     # ─────────────────────────────────
-    
     # Login con JWT (POST: username + password → access y refresh tokens)
     path('auth/jwt/login/', TokenObtainPairView.as_view(), name='jwt_login'),
-    
-    # JWT personalizado
-    path('auth/jwt/login/', CustomTokenObtainPairView.as_view(), name='jwt_login'),
     
     # Refrescar token (POST: refresh_token → nuevo access_token)
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # Verificar token (POST: token → válido o inválido)
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    
+    # JWT personalizado
+    path('auth/jwt/login/', CustomTokenObtainPairView.as_view(), name='jwt_login'),
     
     # ─────────────────────────────────
     # 🔑 AUTENTICACIÓN OAUTH 2.0 (GOOGLE)

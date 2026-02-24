@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from libros import web_views
+from graphene_django.views import GraphQLView
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     # Admin de Django
@@ -16,6 +18,7 @@ urlpatterns = [
     
     # ← AGREGAR: OAuth 2.0 URLs de django-oauth-toolkit
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
     
     # URLs de páginas web (para pruebas)
     path('', web_views.home, name='home'),
